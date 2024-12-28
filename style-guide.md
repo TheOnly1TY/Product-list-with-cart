@@ -11,7 +11,7 @@ The designs were created to the following widths:
 
 ## Colors
 
-- Red: hsl(14, 86%, 42%)
+- Red:hsl(14, 86.00%, 42.00%)
 - Green: hsl(159, 69%, 38%)
 
 - Rose 50: hsl(20, 50%, 98%)
@@ -19,7 +19,7 @@ The designs were created to the following widths:
 - Rose 300: hsl(14, 25%, 72%)
 - Rose 400: hsl(7, 20%, 60%)
 - Rose 500: hsl(12, 20%, 44%)
-- Rose 900: hsl(14, 65%, 9%)
+- Rose 900:hsl(14, 65.20%, 9.00%)
 
 ## Typography
 
