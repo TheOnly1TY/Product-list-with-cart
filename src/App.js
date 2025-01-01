@@ -1,144 +1,53 @@
 import { useState } from "react";
-
-const productData = [
-  {
-    image: {
-      thumbnail: "images/image-waffle-thumbnail.jpg",
-      mobile: "images/image-waffle-mobile.jpg",
-      tablet: "images/image-waffle-tablet.jpg",
-      desktop: "images/image-waffle-desktop.jpg",
-    },
-    name: "Waffle with Berries",
-    category: "Waffle",
-    price: 6.5,
-  },
-  {
-    image: {
-      thumbnail: "images/image-creme-brulee-thumbnail.jpg",
-      mobile: "images/image-creme-brulee-mobile.jpg",
-      tablet: "images/image-creme-brulee-tablet.jpg",
-      desktop: "images/image-creme-brulee-desktop.jpg",
-    },
-    name: "Vanilla Bean Crème Brûlée",
-    category: "Crème Brûlée",
-    price: 7.0,
-  },
-  {
-    image: {
-      thumbnail: "images/image-macaron-thumbnail.jpg",
-      mobile: "images/image-macaron-mobile.jpg",
-      tablet: "images/image-macaron-tablet.jpg",
-      desktop: "images/image-macaron-desktop.jpg",
-    },
-    name: "Macaron Mix of Five",
-    category: "Macaron",
-    price: 8.0,
-  },
-  {
-    image: {
-      thumbnail: "images/image-tiramisu-thumbnail.jpg",
-      mobile: "images/image-tiramisu-mobile.jpg",
-      tablet: "images/image-tiramisu-tablet.jpg",
-      desktop: "images/image-tiramisu-desktop.jpg",
-    },
-    name: "Classic Tiramisu",
-    category: "Tiramisu",
-    price: 5.5,
-  },
-  {
-    image: {
-      thumbnail: "images/image-baklava-thumbnail.jpg",
-      mobile: "images/image-baklava-mobile.jpg",
-      tablet: "images/image-baklava-tablet.jpg",
-      desktop: "images/image-baklava-desktop.jpg",
-    },
-    name: "Pistachio Baklava",
-    category: "Baklava",
-    price: 4.0,
-  },
-  {
-    image: {
-      thumbnail: "images/image-meringue-thumbnail.jpg",
-      mobile: "images/image-meringue-mobile.jpg",
-      tablet: "images/image-meringue-tablet.jpg",
-      desktop: "images/image-meringue-desktop.jpg",
-    },
-    name: "Lemon Meringue Pie",
-    category: "Pie",
-    price: 5.0,
-  },
-  {
-    image: {
-      thumbnail: "images/image-cake-thumbnail.jpg",
-      mobile: "images/image-cake-mobile.jpg",
-      tablet: "images/image-cake-tablet.jpg",
-      desktop: "images/image-cake-desktop.jpg",
-    },
-    name: "Red Velvet Cake",
-    category: "Cake",
-    price: 4.5,
-  },
-  {
-    image: {
-      thumbnail: "images/image-brownie-thumbnail.jpg",
-      mobile: "images/image-brownie-mobile.jpg",
-      tablet: "images/image-brownie-tablet.jpg",
-      desktop: "images/image-brownie-desktop.jpg",
-    },
-    name: "Salted Caramel Brownie",
-    category: "Brownie",
-    price: 4.5,
-  },
-  {
-    image: {
-      thumbnail: "images/image-panna-cotta-thumbnail.jpg",
-      mobile: "images/image-panna-cotta-mobile.jpg",
-      tablet: "images/image-panna-cotta-tablet.jpg",
-      desktop: "images/image-panna-cotta-desktop.jpg",
-    },
-    name: "Vanilla Panna Cotta",
-    category: "Panna Cotta",
-    price: 6.5,
-  },
-];
+import { ProductDescription } from "./ProductDescription";
+import { productData } from "./productData";
+import { LogoName } from "./LogoName";
+import { ProductsList } from "./ProductsList";
+import { Product } from "./Product";
+import { CartCarbonNeutralMessage } from "./CartCarbonNeutralMessage";
 
 export default function App() {
+  const [addedProducts, setAddedProducts] = useState((addedProducts) => []);
+
   return (
     <div className="App">
       <div>
         <LogoName />
-        <ProductsList />
+        <ProductsList>
+          {productData.map((product, i) => (
+            <Product product={product} key={i}>
+              <ProductImageWithButton
+                product={product}
+                addedProducts={addedProducts}
+                setAddedProducts={setAddedProducts}
+              />
+              <ProductDescription product={product} />
+            </Product>
+          ))}
+        </ProductsList>
       </div>
-      <ShoppingCart />
+      <ShoppingCart
+        addedProducts={addedProducts}
+        setAddedProducts={setAddedProducts}
+      />
     </div>
   );
 }
 
-function LogoName() {
-  return <h1 className="logoName">Desserts</h1>;
-}
-
-function ProductsList() {
-  return (
-    <div className="productsList">
-      {productData.map((product, i) => (
-        <Product product={product} key={i} />
-      ))}
-    </div>
-  );
-}
-
-function Product({ product }) {
-  return (
-    <div className="product">
-      <ProductImageWithButton product={product} />
-      <ProductDescription product={product} />
-    </div>
-  );
-}
-
-function ProductImageWithButton({ product }) {
+function ProductImageWithButton({ product, addedProducts, setAddedProducts }) {
   const [displayCounter, setDisplayCounter] = useState(false);
+  function handleAddToCart() {
+    setAddedProducts((prev) => {
+      const existingProduct = prev.find((p) => p.name === product.name);
+      if (existingProduct) {
+        return prev.map((p) =>
+          p.name === product.name ? { ...p, quantity: p.quantity } : p
+        );
+      }
+      return [...prev, { ...product, quantity: 1 }];
+    });
+  }
+
   return (
     <div className="image-button-group">
       <figure className="product-image">
@@ -153,6 +62,7 @@ function ProductImageWithButton({ product }) {
         className={` add-items--button ${
           !displayCounter ? "add-to-cart-btn" : "counter-btn"
         }`}
+        onClick={handleAddToCart}
       >
         {!displayCounter ? (
           <AddToCartButton
@@ -163,19 +73,12 @@ function ProductImageWithButton({ product }) {
           <CounterButton
             displayCounter={displayCounter}
             onDisplayCounter={setDisplayCounter}
+            product={product}
+            addedProducts={addedProducts}
+            setAddedProducts={setAddedProducts}
           />
         )}
       </button>
-    </div>
-  );
-}
-
-function ProductDescription({ product }) {
-  return (
-    <div className="productDescription">
-      <p className="productCategory">{product.category}</p>
-      <h2 className="productName">{product.name}</h2>
-      <p className="productPrice">${product.price.toFixed(2)}</p>
     </div>
   );
 }
@@ -192,11 +95,31 @@ function AddToCartButton({ displayCounter, onDisplayCounter }) {
   );
 }
 
-function CounterButton({ displayCounter, onDisplayCounter }) {
+function CounterButton({
+  product,
+  displayCounter,
+  onDisplayCounter,
+  addedProducts,
+  setAddedProducts,
+}) {
   const [count, setCount] = useState(1);
 
+  function handleIncrementCount() {
+    setCount((prev) => prev + 1);
+    setAddedProducts((prev) =>
+      prev.map((p) =>
+        p.name === product.name ? { ...p, quantity: count + 1 } : p
+      )
+    );
+  }
+
   function handleDecrementCount() {
-    setCount(count - 1);
+    setCount((prev) => prev - 1);
+    setAddedProducts((prev) =>
+      prev.map((p) =>
+        p.name === product.name ? { ...p, quantity: count - 1 } : p
+      )
+    );
     if (count <= 1) {
       onDisplayCounter(!displayCounter);
     }
@@ -204,23 +127,50 @@ function CounterButton({ displayCounter, onDisplayCounter }) {
 
   return (
     <div className="counter">
-      <span onClick={() => handleDecrementCount()}>
+      <span onClick={handleDecrementCount}>
         <img src="images/icon-decrement-quantity.svg" alt="decrement icon" />
       </span>
       <p>{count}</p>
-      <span onClick={() => setCount(count + 1)}>
+      <span onClick={handleIncrementCount}>
         <img src="images/icon-increment-quantity.svg" alt="increment icon" />
       </span>
     </div>
   );
 }
 
-function ShoppingCart() {
+function ShoppingCart({ addedProducts, setAddedProducts }) {
+  const numProductInCart = addedProducts.length;
+  const productInCart = numProductInCart !== 0;
   return (
     <div className="cart">
-      <h3>Your Cart (0)</h3>
-      <EmptyCart />
+      <h3>Your Cart ({productInCart ? numProductInCart : 0})</h3>
+      {numProductInCart !== 0 ? (
+        <CartItems
+          addedProducts={addedProducts}
+          setAddedProducts={setAddedProducts}
+        />
+      ) : (
+        <EmptyCart />
+      )}
     </div>
+  );
+}
+
+function CartItems({ addedProducts, setAddedProducts }) {
+  return (
+    <>
+      {addedProducts.map((cartProduct, i) => (
+        <AddedItems
+          cartProduct={cartProduct}
+          setAddedProducts={setAddedProducts}
+          addedProducts={addedProducts}
+          key={i}
+        />
+      ))}
+      <TotalPriceOrdered />
+      <CartCarbonNeutralMessage />
+      <Button>Confirm Order</Button>
+    </>
   );
 }
 
@@ -233,10 +183,50 @@ function EmptyCart() {
   );
 }
 
-function CartItems() {
-  return;
+function AddedItems({ addedProducts, cartProduct, setAddedProducts }) {
+  // const [totalPrice, setTotalPrice] = useState([]);
+  // DUMMY DATA
+  const pricePerProduct = cartProduct.price.toFixed(2);
+  const totalPricePerProduct = (pricePerProduct * cartProduct.quantity).toFixed(
+    2
+  );
+
+  function handleRemoveProduct(cartProduct) {
+    setAddedProducts(addedProducts.filter((p) => p.name !== cartProduct.name));
+  }
+
+  return (
+    <>
+      <div className="added-products">
+        <div className="addedProductDetails">
+          <h2>{cartProduct.name}</h2>
+          <p>
+            <span className="quantity">{cartProduct.quantity}x</span>
+            <span className="pricePer1">@ ${pricePerProduct}</span>
+            <span className="totalPrice">${totalPricePerProduct}</span>
+          </p>
+        </div>
+        <figure
+          className="remove-icon"
+          onClick={() => handleRemoveProduct(cartProduct)}
+        >
+          <img src="images/icon-remove-item.svg" alt="remove item icon" />
+        </figure>
+      </div>
+      <div className="line"></div>
+    </>
+  );
 }
 
-function AddedItems() {
-  return;
+function TotalPriceOrdered() {
+  return (
+    <div className="totalPriceOrdered">
+      <p>Order Total</p>
+      <h2>$5.50</h2>
+    </div>
+  );
+}
+
+function Button({ children }) {
+  return <button className="orderButton">{children}</button>;
 }
