@@ -344,3 +344,8 @@ body {
     box-shadow: var(--shadow);
   }
 }
+
+.border-red {
+  border: 2px solid var(--Red);
+  border-radius: 8px;
+}
